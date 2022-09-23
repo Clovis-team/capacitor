@@ -368,6 +368,18 @@ public class WebViewLocalServer {
                             CookieManager.getInstance().setCookie(url, cookie);
                         }
                     }
+
+                    int status = conn.getResponseCode();
+                    if (
+                        status == HttpURLConnection.HTTP_MOVED_TEMP ||
+                        status == HttpURLConnection.HTTP_MOVED_PERM ||
+                        status == HttpURLConnection.HTTP_SEE_OTHER ||
+                        status == 307 // Temporary Redirect
+                    ) {
+                        // Return null so that this request will not be intercepted.
+                        return null;
+                    }
+
                     InputStream responseStream = conn.getInputStream();
                     responseStream = jsInjector.getInjectedStream(responseStream);
                     return new WebResourceResponse(
